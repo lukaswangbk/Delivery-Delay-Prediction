@@ -16,8 +16,6 @@ from collections import Counter
 # Visualiztion
 import matplotlib.pyplot as plt
 import seaborn as sns
-import ptitprince as pt # raincloudplot
-from plotnine import  *
 import missingno as msno # missing value
 from IPython.display import display_html
 
