@@ -13,6 +13,10 @@ from tqdm import tqdm
 from datetime import timedelta
 from collections import Counter
 
+# Warning
+import warnings
+warnings.filterwarnings("ignore")
+
 # Visualiztion
 import matplotlib.pyplot as plt
 import seaborn as sns
