@@ -1,7 +1,11 @@
+# random state
+random_state = 4995
+
 # Data Manipulation
 import numpy as np
 import pandas as pd
 import pickle
+import json
 pd.options.mode.chained_assignment = None 
 
 # System Basics
@@ -9,19 +13,31 @@ import os
 import math
 import datetime
 import subprocess
+from time import time
 from tqdm import tqdm
-from datetime import timedelta
+from datetime import timedelta, date
 from collections import Counter
+
+# Math
+## Stat
+from scipy import stats
+
+## Compute Distance
+from geopy import distance
 
 # Warning
 import warnings
 warnings.filterwarnings("ignore")
 
 # Visualiztion
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
-import missingno as msno # missing value
-from IPython.display import display_html
+from wordcloud import WordCloud, STOPWORDS
+import plotly.express as px
+import plotly.graph_objects as go
+import plotly.figure_factory as ff
+from IPython.display import display_html, Image
 
 sns.set_context('paper', font_scale=2)
 sns.set_style('darkgrid')
@@ -32,12 +48,43 @@ sns.set(rc={'figure.figsize': (14, 8)})
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, MinMaxScaler
+from category_encoders import TargetEncoder
 from sklearn.base import TransformerMixin
 
 ## Missing value
 import sys
 import sklearn.neighbors._base
+import missingno as msno
 sys.modules['sklearn.neighbors.base'] = sklearn.neighbors._base
+def count_missing(df):
+    msno.matrix(df)
+    plt.show()
+    total = df.isna().sum().sort_values(ascending=False)
+    percent = (df.isna().sum()/df.isna().count()).sort_values(ascending=False)
+    missing_data_info = (pd.concat([total, percent, df.dtypes], axis=1, keys=['# of missing value', '% of missing value', 'data type']).
+                            to_string(formatters={'% of missing value': '{:,.2%}'.format}))
+    print(missing_data_info)
+    return
+
+## Daypart
+def daypart(hour):
+    if hour in [2,3,4,5]:
+        return "dawn"
+    elif hour in [6,7,8,9]:
+        return "morning"
+    elif hour in [10,11,12,13]:
+        return "noon"
+    elif hour in [14,15,16,17]:
+        return "afternoon"
+    elif hour in [18,19,20,21]:
+        return "evening"
+    else: return "midnight"
+    
+## Holiday
+def is_holiday(d):
+    if d.weekday() > 4 or d==pd.Timestamp(2017, 11, 24, 0, 0, 0):
+        return 1
+    return 0
 
 # Models
 from sklearn.dummy import DummyClassifier
@@ -47,6 +94,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from xgboost import plot_importance
 import lightgbm as lgb
+from catboost import CatBoostClassifier
 
 ## Modelling tools
 from sklearn.pipeline import make_pipeline
@@ -55,13 +103,15 @@ from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSe
 ## imbalance
 from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE 
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.ensemble import BalancedRandomForestClassifier
 
 ## Calibration
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.calibration import calibration_curve
 
 ## Evaluating
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_curve, RocCurveDisplay, precision_recall_curve, PrecisionRecallDisplay
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_curve, RocCurveDisplay, precision_recall_curve, PrecisionRecallDisplay, plot_precision_recall_curve
 
 
 def mem_size(size_bytes):
@@ -133,39 +183,3 @@ sns.set_style('darkgrid')
 pd.options.mode.chained_assignment = None
 pd.set_option('display.float_format', '{:.5f}'.format)
 
-INPUT_PATH = '../input/'
-
-# Features that we finally found important
-numc_features = [#'day_of_week',
-                 #'day',
-                 'hour',
-                 #'minute',
-                 'click_freq_by_ip',
-                 'download_rate_by_ip',
-                 'click_freq_by_app',
-                 'download_rate_by_app',
-                 'click_freq_by_device',
-                 'download_rate_by_device',
-                 'click_freq_by_os',
-                 'download_rate_by_os',
-                 'click_freq_by_channel',
-                 'download_rate_by_channel',
-                 'click_freq_by_hour',
-                 'download_rate_by_hour',
-                 'click_freq_by_app_channel',
-                 'download_rate_by_app_channel',
-                 'click_freq_by_ip_hour',
-                 'download_rate_by_ip_hour',
-                 'click_freq_by_ip_device_app',
-                 'download_rate_by_ip_device_app',
-                 'click_freq_by_ip_device_os',
-                 'download_rate_by_ip_device_os',
-                 'click_freq_by_ip_device_os_hour',
-                 'download_rate_by_ip_device_os_hour',
-                 'nunique_channel_per_ip',
-                 'nunique_device_per_ip',
-                 'nunique_app_per_ip',
-                 'nunique_os_per_ip',
-                 'nunique_channel_per_app']
-te_features = []
-ohe_features = []
