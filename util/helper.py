@@ -92,6 +92,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import SGDClassifier
 from xgboost import XGBClassifier
 from xgboost import plot_importance
 import lightgbm as lgb
