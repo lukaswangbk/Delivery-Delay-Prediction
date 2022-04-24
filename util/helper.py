@@ -99,6 +99,17 @@ import lightgbm as lgb
 from catboost import CatBoostClassifier
 from sklearn.inspection import permutation_importance
 
+## AUC-ROC and Precision Plots
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
+import sklearn
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import plot_confusion_matrix
+from sklearn.metrics import PrecisionRecallDisplay
+from sklearn.metrics import plot_roc_curve
+from str2bool import str2bool
+
 ## Modelling tools
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV, StratifiedKFold
