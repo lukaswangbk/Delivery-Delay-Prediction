@@ -13,3 +13,5 @@ Explanations of the folders:
 - `Model` folder contains the temporary files like the cleaned data that will be accessed to each model files, as well as the trained models themselves.
 
 - the `Report` folder saves the graphs, results and report.
+
+NOTE: Files that are larger than 25MB were stored using large file storage (LFS). More details here: https://git-lfs.github.com/
